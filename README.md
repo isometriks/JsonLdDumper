@@ -128,3 +128,28 @@ And the result:
 ]
 </script>
 ```
+
+Safe Values
+-----------
+
+When serializing any of the entities / static mappings, there can be value
+replacements. Some are deemed safe (replacing an object, that then can be also
+serialized) and some that could be dangerous (replacing a string from an object).
+
+If the string replacement from an object contains any of the patterns that we
+replace then we don't want to parse that value any further. A possible not very
+harmful example:
+
+```php
+class FakeModel
+{
+    public $var = '$static.company';
+}
+```
+
+If any of the objects are user-created then it could be possible to obtain
+information that shouldn't be returned. Since you can create your own parsers
+you might want to be careful with this especially if you provide a callback
+parser, or with the Symfony implementation calling arbitrary services. These
+should only be allowed from the mappings themselves, not from the return values
+of objects. 
