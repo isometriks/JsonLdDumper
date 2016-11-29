@@ -21,25 +21,25 @@ use Isometriks\JsonLdDumper\Test\Model\NewsArticle;
 
 include __DIR__ . '/vendor/autoload.php';
 
-$static = array(
-    'logo' => array(
+$static = [
+    'logo' => [
         '@context' => 'http://schema.org/',
         '@type' => 'ImageObject',
         'url' => 'https://riwebgurus.com/media/image/logo.png',
-    ),
+    ],
 
-    'company' => array(
+    'company' => [
         '@context' => 'http://schema.org/',
         '@type' => 'Organization',
         'name' => 'RI Web Gurus',
         'logo' => '$static.logo',
         'url' => 'https://riwebgurus.com',
-    ),
-);
+    ],
+];
 
 // Entities
-$entities = array(
-    NewsArticle::class => array(
+$entities = [
+    NewsArticle::class => [
         '@context' => 'http://schema.org/',
         '@type' => 'NewsArticle',
         'headline' => '$resource.headline',
@@ -47,37 +47,37 @@ $entities = array(
         'publisher' => '$static.company',
         'datePublished' => '$resource.published',
         'author' => '$resource.author',
-    ),
+    ],
 
-    Image::class => array(
+    Image::class => [
         '@context' => 'http://schema.org/',
         '@type' => 'ImageObject',
         'url' => '$resource.url',
         'width' => '$resource.width',
         'height' => '$resource.height',
-    ),
+    ],
 
-    AuthorInterface::class => array(
+    AuthorInterface::class => [
         '@context' => 'http://schema.org/',
         '@type' => 'Person',
         'name' => '$resource.name',
-    ),
-);
+    ],
+];
 
 $mapping = new MappingConfiguration($static, $entities);
 
-$parser = new Parser($mapping, array(
+$parser = new Parser($mapping, [
     new StaticParser($mapping),
     new ResourceParser(),
     new DateParser(),
-));
+]);
 
 $dumper = new Dumper($mapping, $parser);
 
-echo $dumper->dumpArray(array(
+echo $dumper->dumpArray([
     new NewsArticle(),
     'company',
-));
+]);
 ```
 
 And the result:
@@ -152,4 +152,4 @@ information that shouldn't be returned. Since you can create your own parsers
 you might want to be careful with this especially if you provide a callback
 parser, or with the Symfony implementation calling arbitrary services. These
 should only be allowed from the mappings themselves, not from the return values
-of objects. 
+of objects.
