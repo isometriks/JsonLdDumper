@@ -27,43 +27,36 @@ class Parser implements ParserInterface
 
     public function parse($mapping, $context = null)
     {
-        if (is_array($mapping)) {
+        // Replace values
+        $result = $this->replace(new ReturnValue($mapping, true), $context);
+        $resultValue = $result->getValue();
+
+        // Parse any safe arrays (array wasn't extracted from an object)
+        if ($result->isSafe() && is_array($resultValue)) {
             return array_map(function ($value) use ($context) {
-                return $this->doParse($value, $context);
-            }, $mapping);
-        }
-
-        return $this->doParse($mapping, $context);
-    }
-
-    private function doParse($value, $context = null)
-    {
-        $result = $this->replace($value, $context);
-
-        // Parse any safe arrays
-        if (is_array($result)) {
-            return $this->parse($result, $context);
+                return $this->parse($value, $context);
+            }, $resultValue);
         }
 
         // Parse objects
-        if ($this->isMappable($result)) {
-            $result = $this->parse(
-                $this->mappingConfiguration->getEntityMapping($result),
-                $result
+        if ($this->isMappable($resultValue)) {
+            return $this->parse(
+                $this->mappingConfiguration->getEntityMapping($resultValue),
+                $resultValue
             );
         }
 
-        return $result;
+        return $resultValue;
     }
 
-    private function replace($value, $context)
+    private function replace(ReturnValue $value, $context)
     {
         foreach ($this->replacers as $replacer) {
-            if (!$replacer->canParse($value)) {
+            if (!$replacer->canParse($value->getValue())) {
                 continue;
             }
 
-            $returnValue = $replacer->replace($value, $context);
+            $returnValue = $replacer->replace($value->getValue(), $context);
 
             // Make sure it's a ReturnValue
             if (!$returnValue instanceof ReturnValue) {
@@ -71,11 +64,11 @@ class Parser implements ParserInterface
             }
 
             if ($returnValue->isSafe()) {
-                return $this->replace($returnValue->getValue(), $context);
+                return $this->replace($returnValue, $context);
             }
 
             // Stop evaluating, no longer safe.
-            return $returnValue->getValue();
+            return $returnValue;
         }
 
         return $value;
