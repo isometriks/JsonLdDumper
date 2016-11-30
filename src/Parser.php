@@ -27,9 +27,13 @@ class Parser implements ParserInterface
 
     public function parse($mapping, $context = null)
     {
-        return array_map(function ($value) use ($context) {
-            return $this->doParse($value, $context);
-        }, $mapping);
+        if (is_array($mapping)) {
+            return array_map(function ($value) use ($context) {
+                return $this->doParse($value, $context);
+            }, $mapping);
+        }
+
+        return $this->doParse($mapping, $context);
     }
 
     private function doParse($value, $context = null)

@@ -76,11 +76,11 @@ $parser = new Parser($mapping, [
     new ExpressionReplacer($expressionLanguage),
 ]);
 
-$dumper = new Dumper($mapping, $parser);
+$dumper = new Dumper($parser);
 
-echo $dumper->dumpArray([
+echo $dumper->dump([
     new NewsArticle(),
-    'company',
+    '$static.company',
 ]);
 ```
 

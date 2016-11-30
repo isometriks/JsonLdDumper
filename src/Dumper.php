@@ -2,48 +2,20 @@
 
 namespace Isometriks\JsonLdDumper;
 
-class Dumper
+class Dumper implements DumperInterface
 {
     private $parser;
-    private $mappingConfiguration;
 
-    public function __construct(MappingConfiguration $mappingConfiguration, ParserInterface $parser)
+    public function __construct(ParserInterface $parser)
     {
-        $this->mappingConfiguration = $mappingConfiguration;
         $this->parser = $parser;
     }
 
-    public function dumpEntity($entity)
+    public function dump($data)
     {
-        return $this->dumpJson($this->getEntity($entity));
-    }
+        $parsed = $this->parser->parse($data);
 
-    private function getEntity($entity)
-    {
-        $mapping = $this->mappingConfiguration->getEntityMapping($entity);
-        $parsed = $this->parser->parse($mapping, $entity);
-
-        return $parsed;
-    }
-
-    public function dumpStatic($name)
-    {
-        return $this->dumpJson($this->getStatic($name));
-    }
-
-    private function getStatic($name)
-    {
-        $mapping = $this->mappingConfiguration->getStaticMapping($name);
-        $parsed = $this->parser->parse($mapping);
-
-        return $parsed;
-    }
-
-    public function dumpArray(array $things)
-    {
-        return $this->dumpJson(array_map(function($thing) {
-            return is_object($thing) ? $this->getEntity($thing) : $this->getStatic($thing);
-        }, $things));
+        return $this->dumpJson($parsed);
     }
 
     private function dumpJson($data)
