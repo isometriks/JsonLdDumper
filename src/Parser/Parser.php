@@ -26,58 +26,65 @@ class Parser
 
     public function parse($mapping, $context = null)
     {
-        $parsedMapping = array();
+        $parsedValues = array();
 
         foreach ($mapping as $key => $value) {
-            $currentContext = $context;
-            $result = $this->subParse(new ReturnValue($value, true), $currentContext);
-            $parsedValue = $result->getValue();
-
-            // Parse sub-objects
-            if (is_object($parsedValue) && $this->mappingConfiguration->hasEntityMapping($parsedValue)) {
-                $currentContext = $parsedValue;
-
-                $parsedValue = $this->parse(
-                    $this->mappingConfiguration->getEntityMapping($parsedValue),
-                    $currentContext
-                );
-
-                $result = new ReturnValue($parsedValue, true);
-            }
-
-            // Parse any safe arrays
-            if ($result->isSafe() && is_array($parsedValue)) {
-                $parsedValue = $this->parse($parsedValue, $currentContext);
-            }
-
-            $parsedMapping[$key] = $parsedValue;
+            $parsedValues[$key] = $this->doParse($value, $context);
         }
 
-        return $parsedMapping;
+        return $parsedValues;
+    }
+
+    private function doParse($value, $context = null)
+    {
+        $result = $this->subParse($value, $context);
+
+        // Parse any safe arrays
+        if (is_array($result)) {
+            return $this->parse($result, $context);
+        }
+
+        // Parse objects
+        if ($this->isMappable($result)) {
+            $result = $this->parse(
+                $this->mappingConfiguration->getEntityMapping($result),
+                $result
+            );
+        }
+
+        return $result;
     }
 
     /**
      * @return ReturnValue
      */
-    private function subParse(ReturnValue $value, $context)
+    private function subParse($value, $context)
     {
         foreach ($this->parsers as $parser) {
-            if (!$parser->canParse($value->getValue())) {
+            if (!$parser->canParse($value)) {
                 continue;
             }
 
-            $value = $parser->parseValue($value->getValue(), $context);
+            $returnValue = $parser->parseValue($value, $context);
 
             // Make sure it's a ReturnValue
-            if (!$value instanceof ReturnValue) {
+            if (!$returnValue instanceof ReturnValue) {
                 throw new \InvalidArgumentException('You must return a "ReturnValue" from a parser');
             }
 
-            if ($value->isSafe()) {
-                return $this->subParse($value, $context);
+            if ($returnValue->isSafe()) {
+                return $this->subParse($returnValue->getValue(), $context);
             }
+
+            // Stop evaluating, no longer safe.
+            return $returnValue->getValue();
         }
 
         return $value;
+    }
+
+    private function isMappable($value)
+    {
+        return is_object($value) && $this->mappingConfiguration->hasEntityMapping($value);
     }
 }

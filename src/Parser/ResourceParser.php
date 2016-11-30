@@ -27,7 +27,6 @@ class ResourceParser implements ParserInterface
         // Only allow objects to be further processed, and no __toString
         $isSafe = !is_string($accessedValue) && is_object($accessedValue);
 
-
         return new ReturnValue($accessedValue, $isSafe);
     }
 
