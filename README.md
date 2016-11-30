@@ -111,11 +111,11 @@ And the result:
             },
             "url": "https://riwebgurus.com"
         },
-        "datePublished": "2016-11-29T19:40:17+00:00",
+        "datePublished": "2016-11-30T03:53:00+00:00",
         "author": {
             "@context": "http://schema.org/",
             "@type": "Person",
-            "name": "Craig Blanchette"
+            "name": "Mr. Craig Blanchette"
         }
     },
     {
