@@ -1,11 +1,11 @@
 <?php
 
-namespace Isometriks\JsonLdDumper\Parser;
+namespace Isometriks\JsonLdDumper\Replacer;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-class ResourceParser implements ParserInterface
+class ResourceReplacer implements ReplacerInterface
 {
     private $accessor;
 
@@ -18,7 +18,7 @@ class ResourceParser implements ParserInterface
         return substr($value, 0, 10) === '$resource.';
     }
 
-    public function parseValue($value, $context = null)
+    public function replace($value, $context = null)
     {
         $propertyPath = substr($value, 10);
         $accessor = $this->getAccessor();

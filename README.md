@@ -11,13 +11,15 @@ Here is a quite large example showing most features:
 
 use Isometriks\JsonLdDumper\Dumper;
 use Isometriks\JsonLdDumper\MappingConfiguration;
-use Isometriks\JsonLdDumper\Parser\DateParser;
-use Isometriks\JsonLdDumper\Parser\Parser;
-use Isometriks\JsonLdDumper\Parser\ResourceParser;
-use Isometriks\JsonLdDumper\Parser\StaticParser;
+use Isometriks\JsonLdDumper\Parser;
+use Isometriks\JsonLdDumper\Replacer\DateReplacer;
+use Isometriks\JsonLdDumper\Replacer\ExpressionReplacer;
+use Isometriks\JsonLdDumper\Replacer\ResourceReplacer;
+use Isometriks\JsonLdDumper\Replacer\StaticReplacer;
 use Isometriks\JsonLdDumper\Test\Model\AuthorInterface;
 use Isometriks\JsonLdDumper\Test\Model\Image;
 use Isometriks\JsonLdDumper\Test\Model\NewsArticle;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 include __DIR__ . '/vendor/autoload.php';
 
@@ -60,16 +62,18 @@ $entities = [
     AuthorInterface::class => [
         '@context' => 'http://schema.org/',
         '@type' => 'Person',
-        'name' => '$resource.name',
+        'name' => 'expr:"Mr. " ~ context.getName()',
     ],
 ];
 
 $mapping = new MappingConfiguration($static, $entities);
+$expressionLanguage = new ExpressionLanguage();
 
 $parser = new Parser($mapping, [
-    new StaticParser($mapping),
-    new ResourceParser(),
-    new DateParser(),
+    new StaticReplacer($mapping),
+    new ResourceReplacer(),
+    new DateReplacer(),
+    new ExpressionReplacer($expressionLanguage),
 ]);
 
 $dumper = new Dumper($mapping, $parser);

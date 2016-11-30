@@ -1,6 +1,6 @@
 <?php
 
-namespace Isometriks\JsonLdDumper\Parser;
+namespace Isometriks\JsonLdDumper\Replacer;
 
 final class ReturnValue
 {

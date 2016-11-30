@@ -1,10 +1,10 @@
 <?php
 
-namespace Isometriks\JsonLdDumper\Parser;
+namespace Isometriks\JsonLdDumper\Replacer;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
-class ExpressionParser implements ParserInterface
+class ExpressionReplacer implements ReplacerInterface
 {
     private $expressionLanguage;
 
@@ -22,7 +22,7 @@ class ExpressionParser implements ParserInterface
         return substr($value, 0, 5) === 'expr:';
     }
 
-    public function parseValue($value, $context = null)
+    public function replace($value, $context = null)
     {
         $expression = substr($value, 5);
         $result = $this->expressionLanguage->evaluate($expression, array(

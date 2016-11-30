@@ -2,11 +2,11 @@
 
 use Isometriks\JsonLdDumper\Dumper;
 use Isometriks\JsonLdDumper\MappingConfiguration;
-use Isometriks\JsonLdDumper\Parser\DateParser;
-use Isometriks\JsonLdDumper\Parser\ExpressionParser;
-use Isometriks\JsonLdDumper\Parser\Parser;
-use Isometriks\JsonLdDumper\Parser\ResourceParser;
-use Isometriks\JsonLdDumper\Parser\StaticParser;
+use Isometriks\JsonLdDumper\Parser;
+use Isometriks\JsonLdDumper\Replacer\DateReplacer;
+use Isometriks\JsonLdDumper\Replacer\ExpressionReplacer;
+use Isometriks\JsonLdDumper\Replacer\ResourceReplacer;
+use Isometriks\JsonLdDumper\Replacer\StaticReplacer;
 use Isometriks\JsonLdDumper\Test\Model\AuthorInterface;
 use Isometriks\JsonLdDumper\Test\Model\Image;
 use Isometriks\JsonLdDumper\Test\Model\NewsArticle;
@@ -53,7 +53,7 @@ $entities = [
     AuthorInterface::class => [
         '@context' => 'http://schema.org/',
         '@type' => 'Person',
-        'name' => 'expr:"$static.company"',
+        'name' => 'expr:"Mr. " ~ context.getName()',
     ],
 ];
 
@@ -61,18 +61,18 @@ $mapping = new MappingConfiguration($static, $entities);
 $expressionLanguage = new ExpressionLanguage();
 
 $parser = new Parser($mapping, [
-    new StaticParser($mapping),
-    new ResourceParser(),
-    new DateParser(),
-    new ExpressionParser($expressionLanguage),
+    new StaticReplacer($mapping),
+    new ResourceReplacer(),
+    new DateReplacer(),
+    new ExpressionReplacer($expressionLanguage),
 ]);
 
 $dumper = new Dumper($mapping, $parser);
 
-/*echo $dumper->dumpArray([
+echo $dumper->dumpArray([
     new NewsArticle(),
     'company',
-]);*/
+]);
 
-echo $dumper->dumpEntity(new NewsArticle());
+//echo $dumper->dumpEntity(new NewsArticle());
 //echo $dumper->dumpStatic('company');

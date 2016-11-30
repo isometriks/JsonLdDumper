@@ -2,14 +2,12 @@
 
 namespace Isometriks\JsonLdDumper;
 
-use Isometriks\JsonLdDumper\Parser\Parser;
-
 class Dumper
 {
     private $parser;
     private $mappingConfiguration;
 
-    public function __construct(MappingConfiguration $mappingConfiguration, Parser $parser)
+    public function __construct(MappingConfiguration $mappingConfiguration, ParserInterface $parser)
     {
         $this->mappingConfiguration = $mappingConfiguration;
         $this->parser = $parser;

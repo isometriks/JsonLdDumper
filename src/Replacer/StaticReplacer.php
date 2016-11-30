@@ -1,10 +1,10 @@
 <?php
 
-namespace Isometriks\JsonLdDumper\Parser;
+namespace Isometriks\JsonLdDumper\Replacer;
 
 use Isometriks\JsonLdDumper\MappingConfiguration;
 
-class StaticParser implements ParserInterface
+class StaticReplacer implements ReplacerInterface
 {
     private $mappingConfiguration;
 
@@ -26,7 +26,7 @@ class StaticParser implements ParserInterface
         return $this->mappingConfiguration->hasStaticMapping(substr($value, 8));
     }
 
-    public function parseValue($value, $context = null)
+    public function replace($value, $context = null)
     {
         $staticMapping = $this->mappingConfiguration->getStaticMapping(substr($value, 8));
 
